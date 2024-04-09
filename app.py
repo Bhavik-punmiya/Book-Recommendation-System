@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import numpy as np
+import streamlit.components.v1 as components
 
 # Load data
 popular_df = pickle.load(open('popular.pkl', 'rb'))
@@ -30,8 +31,31 @@ if user_input:
                 'author': temp_df['Book-Author'].values[0]
             })
 
-        # Display recommendations in JSON format
-        st.json(recommendations)
+        # Prepare HTML content for book recommendations
+        html_content = """
+        <div class="container">
+            <div class="row">
+        """
+        for rec in recommendations:
+            html_content += f"""
+            <div class="col-md-3" style="margin-top:50px">
+                <div class="card">
+                    <div class="card-body">
+                        <img class="card-img-top" src="{rec['image_url']}">
+                        <p class="text-white">{rec['title']}</p>
+                        <h4 class="text-white">{rec['author']}</h4>
+                    </div>
+                </div>
+            </div>
+            """
+        html_content += """
+            </div>
+        </div>
+        """
+
+        # Render the HTML content
+        components.html(html_content, height=600)
+
     except IndexError:
         st.write("No recommendations found for the entered book title.")
 
