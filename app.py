@@ -11,7 +11,7 @@ similarity_scores = pickle.load(open('similarity_scores.pkl', 'rb'))
 
 # Setup Jinja2 environment
 env = Environment(
-    loader=PackageLoader('yourapp', 'templates'),
+    loader=PackageLoader('templates'),
     autoescape=select_autoescape(['html', 'xml'])
 )
 
