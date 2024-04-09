@@ -31,6 +31,8 @@ if user_input:
                 'author': temp_df['Book-Author'].values[0]
             })
 
+            
+
         # Prepare HTML content for book recommendations
         html_content = """
         <div class="container">
