@@ -1,7 +1,7 @@
 import streamlit as st
 import pickle
 import numpy as np
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 # Load data
 popular_df = pickle.load(open('popular.pkl', 'rb'))
@@ -11,19 +11,19 @@ similarity_scores = pickle.load(open('similarity_scores.pkl', 'rb'))
 
 # Setup Jinja2 environment
 env = Environment(
-    loader=PackageLoader('templates'),
+    loader=FileSystemLoader('templates'),
     autoescape=select_autoescape(['html', 'xml'])
 )
 
 # Load Jinja2 templates
-popular_template = env.get_template('popular_books.html')
-recommendation_template = env.get_template('recommendation.html')
+popular_template = env.get_template('index.html')
+recommendation_template = env.get_template('recommend.html')
 
 # Render popular books using Jinja2
 st.title("Popular Books")
 st.write("This is a list of popular books.")
 
-# Assuming popular_books.html is your template for popular books
+# Assuming index.html is your template for popular books
 popular_html = popular_template.render(popular_df=popular_df.to_dict(orient='records'))
 st.markdown(popular_html, unsafe_allow_html=True)
 
@@ -36,7 +36,7 @@ if user_input:
         index = np.where(pt.index == user_input)[0][0]
         similar_items = sorted(list(enumerate(similarity_scores[index])), key=lambda x: x[1], reverse=True)[1:9]
 
-        # Assuming recommendation.html is your template for recommendations
+        # Assuming recommend.html is your template for recommendations
         recommendations = []
         for i in similar_items:
             temp_df = books[books['Book-Title'] == pt.index[i[0]]]
