@@ -19,7 +19,7 @@ user_input = st.text_input("Enter a book title to get recommendations:", value=s
 if user_input:
     try:
         index = np.where(pt.index == user_input)[0][0]
-        similar_items = sorted(list(enumerate(similarity_scores[index])), key=lambda x: x[1], reverse=True)[1:9]
+        similar_items = sorted(list(enumerate(similarity_scores[index])), key=lambda x: x[1], reverse=True)[1:17]
 
         recommendations = []
         for i in similar_items:
