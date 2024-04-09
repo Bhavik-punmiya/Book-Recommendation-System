@@ -1,7 +1,6 @@
 import streamlit as st
 import pickle
 import numpy as np
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 # Load data
 popular_df = pickle.load(open('popular.pkl', 'rb'))
@@ -9,34 +8,19 @@ pt = pickle.load(open('pt.pkl', 'rb'))
 books = pickle.load(open('books.pkl', 'rb'))
 similarity_scores = pickle.load(open('similarity_scores.pkl', 'rb'))
 
-# Setup Jinja2 environment
-env = Environment(
-    loader=FileSystemLoader('templates'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
+# Check if 'user_input' is in session state, if not, set it to an empty string
+if 'user_input' not in st.session_state:
+    st.session_state.user_input = ''
 
-# Load Jinja2 templates
-popular_template = env.get_template('index.html')
-recommendation_template = env.get_template('recommend.html')
-
-# Render popular books using Jinja2
-st.title("Popular Books")
-st.write("This is a list of popular books.")
-
-# Assuming index.html is your template for popular books
-popular_html = popular_template.render(popular_df=popular_df.to_dict(orient='records'))
-st.markdown(popular_html, unsafe_allow_html=True)
-
-# Recommendation UI
+# Book Recommendation UI
 st.title("Book Recommendation")
-user_input = st.text_input("Enter a book title to get recommendations:")
+user_input = st.text_input("Enter a book title to get recommendations:", value=st.session_state.user_input)
 
 if user_input:
     try:
         index = np.where(pt.index == user_input)[0][0]
         similar_items = sorted(list(enumerate(similarity_scores[index])), key=lambda x: x[1], reverse=True)[1:9]
 
-        # Assuming recommend.html is your template for recommendations
         recommendations = []
         for i in similar_items:
             temp_df = books[books['Book-Title'] == pt.index[i[0]]]
@@ -46,7 +30,10 @@ if user_input:
                 'author': temp_df['Book-Author'].values[0]
             })
 
-        recommendation_html = recommendation_template.render(recommendations=recommendations)
-        st.markdown(recommendation_html, unsafe_allow_html=True)
+        # Display recommendations in JSON format
+        st.json(recommendations)
     except IndexError:
         st.write("No recommendations found for the entered book title.")
+
+# Update session state with the latest user input
+st.session_state.user_input = user_input
